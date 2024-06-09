@@ -1,15 +1,42 @@
-#!/usr/bin/env bash
-#web_static development
+#!/bin/bash
+#web static development
 
-sudo apt-get -y update
-sudo apt-get -y upgrade
-sudo apt-get -y install nginx
-sudo mkdir -p /data/web_static/releases/test /data/web_static/shared
-echo "Hello, this is a test HTML file." | sudo tee /data/web_static/releases/test/index.html
-sudo rm -rf /data/web_static/current
-sudo ln -s /data/web_static/releases/test/ /data/web_static/current
+sudo apt-get update
+
+# Install Nginx if not already installed
+if ! dpkg -l | grep -q nginx; then
+  sudo apt-get install -y nginx
+fi
+
+# Create the required directories if they don't already exist
+sudo mkdir -p /data/web_static/releases/test/
+sudo mkdir -p /data/web_static/shared/
+
+# Create a fake HTML file to test Nginx configuration
+echo "<html>
+  <head>
+  </head>
+  <body>
+    Hello, Nginx!
+  </body>
+</html>" | sudo tee /data/web_static/releases/test/index.html
+
+# Create (or recreate) the symbolic link
+if [ -L /data/web_static/current ]; then
+  sudo rm /data/web_static/current
+fi
+sudo ln -sf /data/web_static/releases/test/ /data/web_static/current
+
+# Give ownership of the /data/ folder to the ubuntu user and group
 sudo chown -R ubuntu:ubuntu /data/
-sudo sed -i '44i \\n\tlocation /hbnb_static {\n\t\talias /data/web_static/current/;\n\t}' /etc/nginx/sites-available/default
+
+# Update Nginx configuration to serve content
+nginx_conf="/etc/nginx/sites-available/default"
+sudo sed -i "/server_name _;/a \\
+    location /hbnb_static {\\n\\
+        alias /data/web_static/current/;\\n\\
+    }" $nginx_conf
+
+# Restart Nginx to apply the changes
 sudo service nginx restart
 
-exit 0
