@@ -2,7 +2,7 @@
 """Fabric script which generates a tgz archive"""
 
 from datetime import datetime
-from fabric.api import local
+from fabric import local
 from os.path import isdir
 
 
@@ -17,4 +17,3 @@ def do_pack():
         return file_name
     except:
         return None
-        
