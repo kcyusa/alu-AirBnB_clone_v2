@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #web static development
 
 sudo apt-get update
