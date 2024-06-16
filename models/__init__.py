@@ -1,28 +1,15 @@
 #!/usr/bin/python3
-"""
-This module serves as the initialization file for the models package.
-"""
-from models.base_model import BaseModel
-from models.engine.file_storage import FileStorage
-from models.user import User
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.place import Place
-from models.review import Review
+"""This module instantiates an object of class FileStorage!"""
+import os
 
+if os.getenv("HBNB_TYPE_STORAGE") == "db":
+    from models.engine.db_storage import DBStorage
 
-storage = FileStorage()
-storage.reload()
-loaded_objects = storage.all()
+    storage = DBStorage()
+    storage.reload()
+else:
 
+    from models.engine.file_storage import FileStorage
 
-classes = {
-    "BaseModel": BaseModel,
-    "User": User,
-    "State": State,
-    "City": City,
-    "Amenity": Amenity,
-    "Place": Place,
-    "Review": Review
-}
+    storage = FileStorage()
+    storage.reload()

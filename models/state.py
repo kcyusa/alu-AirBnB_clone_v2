@@ -1,20 +1,27 @@
 #!/usr/bin/python3
-"""
-This module contains the State class (Blueprint for creating State objects).
-"""
+""" State Module for HBNB project! """
+import models
+from models.base_model import BaseModel, Base
+import os
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
+from models.city import City
 
-from models.base_model import BaseModel
 
+class State(BaseModel, Base):
+    """ State class """
 
-class State(BaseModel):
-    """
-    This is the state class
+    __tablename__ = "states"
 
-    Attributes:
-        name (str): The name of the state
-    """
-    name = ""
+    name = Column(String(128), nullable=False)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.name = State.name
+    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+        cities = relationship('City', backref="state",
+                              cascade="all, delete, delete-orphan")
+    else:
+        @property
+        def cities(self):
+            """ Returns the list of City instances with state_id
+            equals to the current State.id. """
+            return [city for city in models.storage.all(City).values()
+                    if city.state_id == self.id]

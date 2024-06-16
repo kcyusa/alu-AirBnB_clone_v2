@@ -1,23 +1,15 @@
 #!/usr/bin/python3
-"""
-This module contains the City class (Blueprint for creating City objects).
-"""
+""" City Module for HBNB project!"""
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship
 
-from models.base_model import BaseModel
 
+class City(BaseModel, Base):
+    """ The city class, contains state ID and name """
 
-class City(BaseModel):
-    """
-    This is the city class
+    __tablename__ = 'cities'
 
-    Attributes:
-        state_id (str): The state id
-        name (str): The name of the city
-    """
-    state_id = ""
-    name = ""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # self.name = City.name
-        # self.state_id = City.state_id
+    state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
+    name = Column(String(128), nullable=False)
+    places = relationship("Place", backref="cities")
